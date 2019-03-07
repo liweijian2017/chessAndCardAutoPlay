@@ -1,0 +1,276 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const dm = require("dm.dll");
+const five = './img/5.bmp';
+const ten = './img/10.bmp';
+const mlong = './img/mailong.bmp';
+const mhu = './img/maihu.bmp';
+const kaishi = './img/kaishi.bmp';
+const huying = './img/huying.bmp';
+const longying = './img/longying.bmp';
+const wx = './img/wx.bmp';
+const pro = ["0,1,0", "1,1,1", "1,0,0", "1,0,1", "0,0,1", "1,1,0", "0,0,0"];
+const xiazhuPro = [5, 20, 40, 80, 165, 340];
+let proIndex = 0;
+let preSendMoney = 0;
+let gPreWin = 0;
+let isWin = 0;
+let playGames = 0;
+let recored = [];
+let myMoney = 650;
+let pipeicishu = 0;
+let tempPro = null;
+let preXiaZhu = 0;
+let xiazhujine = 5;
+let loseTimes = 0;
+let chooseProIndex = 0;
+// 止损连输盘数
+let zhisunNum = 5;
+// 买了龙还是虎
+let maiLH = 0;
+// 找微信
+let fWx = dm.findPic(0, 0, 2000, 2000, wx, '222222', 0.9, 1 /* LeftToRightAndBottomToTop */);
+let isNew = dm.findPic(0, 0, 1000, 1000, kaishi, '101010', 0.9, 1 /* LeftToRightAndBottomToTop */);
+let fPicPos = dm.findPic(0, 0, 1000, 1000, five, '222222', 0.9, 1 /* LeftToRightAndBottomToTop */);
+let tPicPos = dm.findPic(0, 0, 1000, 1000, ten, '222222', 0.9, 1 /* LeftToRightAndBottomToTop */);
+let mLongPos = dm.findPic(0, 0, 1000, 1000, mlong, '222222', 0.9, 1 /* LeftToRightAndBottomToTop */);
+let mHuPos = dm.findPic(0, 0, 1000, 1000, mhu, '222222', 0.9, 1 /* LeftToRightAndBottomToTop */);
+let gameBeginlistener = null;
+let zhengzaijiesuanlistener = null;
+let mLongPosX = 0;
+let mLongPosY = 0;
+let mHuPosX = 0;
+let mHuPosY = 0;
+function init() {
+    mLongPosX = Number(document.getElementById('longX').value);
+    mLongPosY = Number(document.getElementById('longY').value);
+    mHuPosX = Number(document.getElementById('huX').value);
+    mHuPosY = Number(document.getElementById('huY').value);
+    gPreWin = 1;
+    //myMoney = Number((document.getElementById('capital') as any).value);
+}
+exports.init = init;
+function allStop(isZhisun) {
+    console.log(isZhisun, '打报告');
+    clearInterval(gameBeginlistener);
+    clearInterval(zhengzaijiesuanlistener);
+    let rCode = 2;
+    // 常规暂停
+    if (!isZhisun) {
+        rCode = 1;
+        setTimeout(() => {
+            // 重新启动
+            gameBegin();
+        }, 60000 * 5);
+    }
+    // 上报
+    report(rCode);
+}
+exports.allStop = allStop;
+function report(code) {
+    if (!fWx) {
+        return;
+    }
+    // 移动鼠标
+    moveTo(fWx.x, fWx.y);
+    // 点击对话
+    lClick(1);
+    // 输入代码
+    if (code == 1) {
+        dm.keyDown(97);
+        dm.keyUp(97);
+    }
+    else {
+        dm.keyDown(98);
+        dm.keyUp(98);
+    }
+    // 发送
+    dm.keyDown(13);
+    dm.keyUp(13);
+    resetPos();
+}
+function gameBegin() {
+    printEle.innerText = 'waiting........';
+    clearInterval(zhengzaijiesuanlistener);
+    if (gameBeginlistener) {
+        clearInterval(gameBeginlistener);
+    }
+    gameBeginlistener = setInterval(function name() {
+        var a = './img/kaishixiazhu.bmp';
+        let isNew = dm.findPic(0, 0, 1000, 1000, a, '222222', 0.9, 1 /* LeftToRightAndBottomToTop */);
+        if (isNew) {
+            text = text + '\n' + ('开始下注');
+            printEle.innerText = text;
+            kaishixiazhu();
+            clearInterval(gameBeginlistener);
+        }
+    }, 400);
+}
+exports.gameBegin = gameBegin;
+function lClick(times) {
+    for (let i = 0; i < times; i++) {
+        setTimeout(function () {
+            dm.leftClick();
+        }, i * 160);
+    }
+}
+function moveTo(x, y) {
+    dm.moveTo(x, y);
+}
+function resetPos() {
+    dm.moveTo(0, 0);
+}
+function isNewGame() {
+    let isNew = dm.findPic(0, 0, 1000, 1000, mhu, '222222', 0.9, 1 /* LeftToRightAndBottomToTop */);
+    if (!isNew) {
+        return false;
+    }
+    return true;
+}
+function findZhengzaijiesuan() {
+    if (zhengzaijiesuanlistener) {
+        clearInterval(zhengzaijiesuanlistener);
+    }
+    zhengzaijiesuanlistener = setInterval(function name() {
+        var a = './img/zhengzaijiesuan.bmp';
+        let isNew = dm.findPic(0, 0, 1000, 1000, a, '222222', 0.9, 1 /* LeftToRightAndBottomToTop */);
+        if (isNew) {
+            text = text + '\n' + ('正在结算');
+            text = text + '\n' + ('***************************');
+            printEle.innerText = text;
+            printEle.setAttribute('data-clipboard-text', text);
+            //console.log(clipboard())
+            text = '...';
+            jiesuan();
+            clearInterval(zhengzaijiesuanlistener);
+        }
+    }, 800);
+}
+function touzhu(target, money) {
+    if (!mLongPosX || !mHuPosX) {
+        return;
+    }
+    let tarPos = target == 0 ? [mLongPosX, mLongPosY] : [mHuPosX, mHuPosY];
+    // 移动鼠标
+    moveTo(tarPos[0], tarPos[1]);
+    setTimeout(() => {
+        // 点击下注
+        lClick(money / 5);
+    }, 0);
+    text = text + '\n' + ('今期下注 ： ' + target + ' **下注金额：' + money);
+    printEle.innerText = text;
+    xiazhujine = money;
+    preXiaZhu = target;
+}
+function fenxitouzhu(pre) {
+    text = text + '\n' + ('上期开：' + pre);
+    text = text + '\n' + ('上期投注金额：' + xiazhujine);
+    printEle.innerText = text;
+    // 不是打和
+    if (pre != 2) {
+        // win
+        if (preXiaZhu == pre) {
+            isFinishTarget();
+            let loseMoney = 0;
+            if (!loseTimes) {
+                for (let l = 0; l < loseTimes; l++) {
+                    loseMoney += xiazhuPro[l];
+                }
+            }
+            myMoney += Number(xiazhujine) * 0.95 - (loseMoney);
+            loseTimes = 0;
+            text = text + '\n' + ('上期赢了');
+            printEle.innerText = text;
+        }
+        else {
+            // lose
+            myMoney -= Number(xiazhuPro[loseTimes]);
+            loseTimes++;
+            text = text + '\n' + ('上期输了,连续输的盘数: ' + loseTimes);
+            printEle.innerText = text;
+            zhisun(loseTimes);
+        }
+    }
+    else {
+        text = text + '\n' + ('上期和,连续输的盘数: ' + loseTimes);
+        printEle.innerText = text;
+        // 止损
+        zhisun(loseTimes);
+    }
+    text = text + '\n' + ('手上的钱: ' + myMoney + ' 盈利：' + (myMoney - 650));
+    printEle.innerText = text;
+    // 和,继续下注额
+    xiazhujine = xiazhuPro[loseTimes];
+    let takePro = 0;
+    if (tempPro && pipeicishu > 0) {
+        takePro = tempPro[pipeicishu];
+        if (pipeicishu == 2) {
+            pipeicishu = 0;
+            // 下一个pro
+            chooseProIndex++;
+            if (chooseProIndex > 2) {
+                chooseProIndex = 0;
+            }
+        }
+        if (pipeicishu) {
+            pipeicishu++;
+        }
+    }
+    else {
+        // let index = Math.floor((Math.random() * 7))
+        text = text + '\n' + ('取第' + (chooseProIndex + 1) + '个样本匹配');
+        printEle.innerText = text;
+        tempPro = pro[chooseProIndex].split(',');
+        takePro = tempPro[pipeicishu];
+        pipeicishu++;
+    }
+    text = text + '\n' + ('tempPro : ' + tempPro + '  takePro:' + takePro);
+    printEle.innerText = text;
+    // doit
+    maiLH = Number(takePro);
+    touzhu(Number(takePro), xiazhujine);
+    // 局数+1
+    playGames++;
+    setTimeout(() => {
+        findZhengzaijiesuan();
+    }, 2000);
+}
+function jiesuan() {
+    // 上报
+    gameBegin();
+}
+function zhisun(num) {
+    if (num == zhisunNum) {
+        allStop(true);
+    }
+}
+function isFinishTarget() {
+    text = text + '\n' + ('已经游戏了' + (playGames) + '局');
+    printEle.innerText = text;
+    if (playGames >= 18) {
+        allStop(false);
+    }
+}
+function kaishixiazhu() {
+    clearInterval(gameBeginlistener);
+    setTimeout(() => {
+        let a = './img/huying.bmp';
+        let b = './img/longying.bmp';
+        let preWin = 0;
+        let huWin = dm.findPic(0, 0, 1000, 1000, a, '222222', 0.9, 1 /* LeftToRightAndBottomToTop */);
+        let longWin = dm.findPic(0, 0, 1000, 1000, b, '222222', 0.9, 1 /* LeftToRightAndBottomToTop */);
+        if (huWin) {
+            preWin = 1;
+        }
+        else if (longWin) {
+            preWin = 0;
+        }
+        else {
+            preWin = 2;
+        }
+        fenxitouzhu(preWin);
+    }, 2000);
+}
+let printEle = document.getElementById('print');
+let text = '';
+//# sourceMappingURL=dm.js.map

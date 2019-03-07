@@ -1,0 +1,1 @@
+call electron-packager . helloworld --out but_editor
