@@ -10,7 +10,7 @@ const huying = './img/huying.bmp';
 const longying = './img/longying.bmp';
 const wx = './img/wx.bmp';
 const pro = ["0,1,0", "1,1,1", "1,0,0", "1,0,1", "0,0,1", "1,1,0", "0,0,0"];
-const xiazhuPro = [5, 20, 40, 80, 165, 340];
+const xiazhuPro = [5, 20, 40, 80, 165, 5, 5, 5, 5, 5, 5, 5, 5];
 let proIndex = 0;
 let preSendMoney = 0;
 let gPreWin = 0;
@@ -23,6 +23,7 @@ let tempPro = null;
 let preXiaZhu = 0;
 let xiazhujine = 5;
 let loseTimes = 0;
+let isNewRound = true;
 let chooseProIndex = 0;
 // 止损连输盘数
 let zhisunNum = 5;
@@ -47,6 +48,8 @@ function init() {
     mHuPosX = Number(document.getElementById('huX').value);
     mHuPosY = Number(document.getElementById('huY').value);
     gPreWin = 1;
+    isNewRound = true;
+    playGames = 0;
     //myMoney = Number((document.getElementById('capital') as any).value);
 }
 exports.init = init;
@@ -60,6 +63,7 @@ function allStop(isZhisun) {
         rCode = 1;
         setTimeout(() => {
             // 重新启动
+            init();
             gameBegin();
         }, 60000 * 5);
     }
@@ -84,13 +88,17 @@ function report(code) {
         dm.keyDown(98);
         dm.keyUp(98);
     }
-    // 发送
-    dm.keyDown(13);
-    dm.keyUp(13);
+    setTimeout(() => {
+        // 发送
+        dm.keyDown(13);
+        dm.keyUp(13);
+    }, 800);
     resetPos();
 }
 function gameBegin() {
     printEle.innerText = 'waiting........';
+    zhisun(loseTimes);
+    isFinishTarget();
     clearInterval(zhengzaijiesuanlistener);
     if (gameBeginlistener) {
         clearInterval(gameBeginlistener);
@@ -179,11 +187,13 @@ function fenxitouzhu(pre) {
             }
             myMoney += Number(xiazhujine) * 0.95 - (loseMoney);
             loseTimes = 0;
+            gPreWin = 1;
             text = text + '\n' + ('上期赢了');
             printEle.innerText = text;
         }
         else {
             // lose
+            gPreWin = 0;
             myMoney -= Number(xiazhuPro[loseTimes]);
             loseTimes++;
             text = text + '\n' + ('上期输了,连续输的盘数: ' + loseTimes);
@@ -192,6 +202,7 @@ function fenxitouzhu(pre) {
         }
     }
     else {
+        gPreWin = 0;
         text = text + '\n' + ('上期和,连续输的盘数: ' + loseTimes);
         printEle.innerText = text;
         // 止损
@@ -224,6 +235,10 @@ function fenxitouzhu(pre) {
         takePro = tempPro[pipeicishu];
         pipeicishu++;
     }
+    // 新的循环从五开始
+    if (isNewRound) {
+        xiazhujine = 5;
+    }
     text = text + '\n' + ('tempPro : ' + tempPro + '  takePro:' + takePro);
     printEle.innerText = text;
     // doit
@@ -231,6 +246,7 @@ function fenxitouzhu(pre) {
     touzhu(Number(takePro), xiazhujine);
     // 局数+1
     playGames++;
+    isNewRound = false;
     setTimeout(() => {
         findZhengzaijiesuan();
     }, 2000);
@@ -242,13 +258,15 @@ function jiesuan() {
 function zhisun(num) {
     if (num == zhisunNum) {
         allStop(true);
+        return;
     }
 }
 function isFinishTarget() {
     text = text + '\n' + ('已经游戏了' + (playGames) + '局');
     printEle.innerText = text;
-    if (playGames >= 18) {
+    if (playGames >= 18 || gPreWin) {
         allStop(false);
+        return;
     }
 }
 function kaishixiazhu() {

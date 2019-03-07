@@ -11,7 +11,7 @@ const huying = './img/huying.bmp'
 const longying = './img/longying.bmp'
 const wx = './img/wx.bmp'
 const pro = ["0,1,0", "1,1,1", "1,0,0", "1,0,1", "0,0,1", "1,1,0", "0,0,0"]
-const xiazhuPro = [5, 20, 40, 80, 165, 340]
+const xiazhuPro = [5, 20, 40, 80, 165, 5, 5, 5, 5, 5, 5, 5, 5]
 
 let proIndex = 0
 let preSendMoney = 0
@@ -60,14 +60,13 @@ export function init() {
     mHuPosY = Number((document.getElementById('huY') as any).value)
 
     gPreWin = 1
-
     isNewRound = true
     playGames = 0
     //myMoney = Number((document.getElementById('capital') as any).value);
 }
 
 export function allStop(isZhisun: boolean) {
-    console.log(isZhisun , '打报告')
+    console.log(isZhisun, '打报告')
     clearInterval(gameBeginlistener)
     clearInterval(zhengzaijiesuanlistener)
     let rCode = 2
@@ -78,6 +77,7 @@ export function allStop(isZhisun: boolean) {
 
         setTimeout(() => {
             // 重新启动
+            init()
             gameBegin()
         }, 60000 * 5);
     }
@@ -106,15 +106,19 @@ function report(code: number) {
         dm.keyUp(98)
     }
 
-    // 发送
-    dm.keyDown(13)
-    dm.keyUp(13)
+    setTimeout(() => {
+        // 发送
+        dm.keyDown(13)
+        dm.keyUp(13)
+    }, 800);
 
     resetPos()
 }
 
 export function gameBegin() {
     printEle.innerText = 'waiting........'
+    zhisun(loseTimes)
+    isFinishTarget()
     clearInterval(zhengzaijiesuanlistener)
     if (gameBeginlistener) {
         clearInterval(gameBeginlistener)
@@ -220,10 +224,12 @@ function fenxitouzhu(pre: number) {
             myMoney += Number(xiazhujine) * 0.95 - (loseMoney);
 
             loseTimes = 0
+            gPreWin = 1
             text = text + '\n' + ('上期赢了')
             printEle.innerText = text
         } else {
             // lose
+            gPreWin = 0
             myMoney -= Number(xiazhuPro[loseTimes]);
             loseTimes++
             text = text + '\n' + ('上期输了,连续输的盘数: ' + loseTimes)
@@ -231,6 +237,7 @@ function fenxitouzhu(pre: number) {
             zhisun(loseTimes)
         }
     } else {
+        gPreWin = 0
         text = text + '\n' + ('上期和,连续输的盘数: ' + loseTimes)
         printEle.innerText = text
         // 止损
@@ -295,14 +302,16 @@ function jiesuan() {
 function zhisun(num: number) {
     if (num == zhisunNum) {
         allStop(true)
+        return
     }
 }
 
 function isFinishTarget() {
     text = text + '\n' + ('已经游戏了' + (playGames) + '局')
     printEle.innerText = text
-    if (playGames >= 18) {
+    if (playGames >= 18 || gPreWin) {
         allStop(false)
+        return
     }
 }
 
