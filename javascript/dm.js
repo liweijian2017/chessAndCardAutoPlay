@@ -10,7 +10,7 @@ const huying = './img/huying.bmp';
 const longying = './img/longying.bmp';
 const wx = './img/wx.bmp';
 const pro = ["0,1,0", "1,1,1", "1,0,0", "1,0,1", "0,0,1", "1,1,0", "0,0,0"];
-const xiazhuPro = [5, 20, 40, 80, 165, 5, 5, 5, 5, 5, 5, 5, 5];
+const xiazhuPro = [5, 20, 40, 80, 165, 0, 0, 0, 0, 0, 0, 0, 0];
 let proIndex = 0;
 let preSendMoney = 0;
 let gPreWin = 0;
@@ -54,7 +54,6 @@ function init() {
 }
 exports.init = init;
 function allStop(isZhisun) {
-    console.log(isZhisun, '打报告');
     clearInterval(gameBeginlistener);
     clearInterval(zhengzaijiesuanlistener);
     let rCode = 2;
@@ -65,7 +64,7 @@ function allStop(isZhisun) {
             // 重新启动
             init();
             gameBegin();
-        }, 60000 * 5);
+        }, 60000 * 2);
     }
     // 上报
     report(rCode);
@@ -77,23 +76,27 @@ function report(code) {
     }
     // 移动鼠标
     moveTo(fWx.x, fWx.y);
-    // 点击对话
-    lClick(1);
-    // 输入代码
-    if (code == 1) {
-        dm.keyDown(97);
-        dm.keyUp(97);
-    }
-    else {
-        dm.keyDown(98);
-        dm.keyUp(98);
-    }
+    setTimeout(() => {
+        // 点击对话
+        lClick(1);
+    }, 500);
+    setTimeout(() => {
+        // 输入代码
+        if (code == 1) {
+            dm.keyDown(97);
+            dm.keyUp(97);
+        }
+        else {
+            dm.keyDown(98);
+            dm.keyUp(98);
+        }
+    }, 1000);
     setTimeout(() => {
         // 发送
         dm.keyDown(13);
         dm.keyUp(13);
-    }, 800);
-    resetPos();
+    }, 1500);
+    //resetPos()
 }
 function gameBegin() {
     printEle.innerText = 'waiting........';
@@ -258,7 +261,6 @@ function jiesuan() {
 function zhisun(num) {
     if (num == zhisunNum) {
         allStop(true);
-        return;
     }
 }
 function isFinishTarget() {
@@ -266,7 +268,6 @@ function isFinishTarget() {
     printEle.innerText = text;
     if (playGames >= 18 || gPreWin) {
         allStop(false);
-        return;
     }
 }
 function kaishixiazhu() {
