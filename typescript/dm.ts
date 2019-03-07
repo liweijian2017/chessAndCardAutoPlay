@@ -36,13 +36,13 @@ let maiLH = 0
 
 // 找微信
 let fWx = dm.findPic(0, 0, 2000, 2000, wx, '222222', 0.9, FindDir.LeftToRightAndBottomToTop)
-let isNew = dm.findPic(0, 0, 1000, 1000, kaishi, '101010', 0.9, FindDir.LeftToRightAndBottomToTop)
+let isNew = dm.findPic(0, 0, 2000, 2000, kaishi, '101010', 0.9, FindDir.LeftToRightAndBottomToTop)
 
-let fPicPos = dm.findPic(0, 0, 1000, 1000, five, '222222', 0.9, FindDir.LeftToRightAndBottomToTop)
-let tPicPos = dm.findPic(0, 0, 1000, 1000, ten, '222222', 0.9, FindDir.LeftToRightAndBottomToTop)
+let fPicPos = dm.findPic(0, 0, 2000, 2000, five, '222222', 0.9, FindDir.LeftToRightAndBottomToTop)
+let tPicPos = dm.findPic(0, 0, 2000, 2000, ten, '222222', 0.9, FindDir.LeftToRightAndBottomToTop)
 
-let mLongPos = dm.findPic(0, 0, 1000, 1000, mlong, '222222', 0.9, FindDir.LeftToRightAndBottomToTop)
-let mHuPos = dm.findPic(0, 0, 1000, 1000, mhu, '222222', 0.9, FindDir.LeftToRightAndBottomToTop)
+let mLongPos = dm.findPic(0, 0, 2000, 2000, mlong, '222222', 0.9, FindDir.LeftToRightAndBottomToTop)
+let mHuPos = dm.findPic(0, 0, 2000, 2000, mhu, '222222', 0.9, FindDir.LeftToRightAndBottomToTop)
 
 let gameBeginlistener = null
 let zhengzaijiesuanlistener = null
@@ -126,7 +126,7 @@ export function gameBegin() {
 
     gameBeginlistener = setInterval(function name() {
         var a = './img/kaishixiazhu.bmp'
-        let isNew = dm.findPic(0, 0, 1000, 1000, a, '222222', 0.9, FindDir.LeftToRightAndBottomToTop)
+        let isNew = dm.findPic(0, 0, 2000, 2000, a, '222222', 0.9, FindDir.LeftToRightAndBottomToTop)
         if (isNew) {
             text = text + '\n' + ('开始下注')
             printEle.innerText = text
@@ -153,7 +153,7 @@ function resetPos() {
 }
 
 function isNewGame(): boolean {
-    let isNew = dm.findPic(0, 0, 1000, 1000, mhu, '222222', 0.9, FindDir.LeftToRightAndBottomToTop)
+    let isNew = dm.findPic(0, 0, 2000, 2000, mhu, '222222', 0.9, FindDir.LeftToRightAndBottomToTop)
     if (!isNew) {
         return false
     }
@@ -167,7 +167,7 @@ function findZhengzaijiesuan() {
 
     zhengzaijiesuanlistener = setInterval(function name() {
         var a = './img/zhengzaijiesuan.bmp'
-        let isNew = dm.findPic(0, 0, 1000, 1000, a, '222222', 0.9, FindDir.LeftToRightAndBottomToTop)
+        let isNew = dm.findPic(0, 0, 2000, 2000, a, '222222', 0.9, FindDir.LeftToRightAndBottomToTop)
         if (isNew) {
             text = text + '\n' + ('正在结算')
             text = text + '\n' + ('***************************')
@@ -322,8 +322,8 @@ function kaishixiazhu() {
         let a = './img/huying.bmp'
         let b = './img/longying.bmp'
         let preWin = 0
-        let huWin = dm.findPic(0, 0, 1000, 1000, a, '222222', 0.9, FindDir.LeftToRightAndBottomToTop)
-        let longWin = dm.findPic(0, 0, 1000, 1000, b, '222222', 0.9, FindDir.LeftToRightAndBottomToTop)
+        let huWin = dm.findPic(0, 0, 2000, 2000, a, '222222', 0.9, FindDir.LeftToRightAndBottomToTop)
+        let longWin = dm.findPic(0, 0, 2000, 2000, b, '222222', 0.9, FindDir.LeftToRightAndBottomToTop)
 
         if (huWin) {
             preWin = 1
